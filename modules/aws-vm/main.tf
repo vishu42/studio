@@ -68,3 +68,4 @@ resource "aws_instance" "vm" {
     Name = var.vm_name
   }
 }
+
