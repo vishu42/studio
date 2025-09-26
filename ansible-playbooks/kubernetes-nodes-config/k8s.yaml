@@ -1,52 +1,35 @@
----
-- name: "Add gpg key (Ubuntu)"
-  apt_key:
-    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
-    state: present
-  when: ansible_distribution == "Ubuntu"
+- name: install kube binaries
+  hosts: all
+  become: yes
+  tasks:
+    - include_tasks: bootstrap_ubuntu.yaml # Contains tasks bootstrap components for ubuntu systems
+      when: ansible_distribution == "Ubuntu"
 
-- name: "Add kubernetes source list (Ubuntu)"
-  apt_repository:
-    repo: "deb http://apt.kubernetes.io/ kubernetes-{{ ansible_distribution_release }} main"
-    state: present
-    filename: "kubernetes"
-  when: ansible_distribution == "Ubuntu"
+    - name: "Add gpg key (Ubuntu)"
+      apt_key:
+        url: https://pkgs.k8s.io/core:/stable:/v1.34/deb/Release.key
+        state: present
+        keyring: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+      when: ansible_distribution == "Ubuntu"
 
-- name: "Update the repository cache (Ubuntu)"
-  apt:
-    update_cache: yes
-  when: ansible_distribution == "Ubuntu"
+    - name: "Add kubernetes source list (Ubuntu)"
+      apt_repository:
+        repo: "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.34/deb/ /"
+        state: present
+        filename: "kubernetes"
+      when: ansible_distribution == "Ubuntu"
 
-- name: "Add Kubernetes repository and install gpg key (CentOS)"
-  yum_repository:
-    name: kubernetes
-    description: Kubernetes repository
-    baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
-    gpgcheck: yes
-    enabled: yes
-    repo_gpgcheck: yes
-    gpgkey:
-      - https://packages.cloud.google.com/yum/doc/yum-key.gpg
-      - https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
-  when: ansible_distribution == "CentOS"
+    - name: "Update the repository cache (Ubuntu)"
+      apt:
+        update_cache: yes
+      when: ansible_distribution == "Ubuntu"
 
-- name: "Disable SELinux (CentOS)"
-  selinux:
-    state: disabled
-  when: ansible_distribution == "CentOS"
-
-- name: "Install kubelet,kubeadm,kubectl (CentOS)"
-  yum: state=present name={{ item }}
-  with_items:
-    - kubelet
-    - kubeadm
-    - kubectl
-  when: ansible_distribution == "CentOS"
-
-- name: "Install kubelet, kubeadm, kubectl (Ubuntu)"
-  apt: name={{item}} state=installed
-  with_items:
-    - kubelet
-    - kubeadm
-    - kubectl
-  when: ansible_distribution == "Ubuntu"
+    - name: "Install kubelet, kubeadm, kubectl (Ubuntu)"
+      apt:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - kubelet
+        - kubeadm
+        - kubectl
+      when: ansible_distribution == "Ubuntu"
