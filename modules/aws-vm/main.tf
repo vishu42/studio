@@ -36,7 +36,7 @@ resource "local_file" "private_key" {
 resource "aws_security_group" "ssh_access" {
   name_prefix = "${var.vm_name}-ssh-sg"
   description = "Security group for SSH access to ${var.vm_name}"
-
+  vpc_id      = var.vpc_id
   ingress {
     description = "SSH"
     from_port   = 22
@@ -60,9 +60,10 @@ resource "aws_security_group" "ssh_access" {
 
 resource "aws_instance" "vm" {
   ami                    = data.aws_ami.ubuntu.id
-  instance_type          = "t3.small"  # 2GB RAM, 2 vCPUs
+  instance_type          = "t3.small" # 2GB RAM, 2 vCPUs
   key_name               = aws_key_pair.ssh_key.key_name
   vpc_security_group_ids = [aws_security_group.ssh_access.id]
+  subnet_id              = var.subnet_id
 
   tags = {
     Name = var.vm_name
