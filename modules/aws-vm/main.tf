@@ -32,7 +32,7 @@ resource "local_file" "private_key" {
   file_permission = "0600"
 }
 
-# Security group to allow SSH traffic
+# default security group to allow SSH traffic
 resource "aws_security_group" "ssh_access" {
   name_prefix = "${var.vm_name}-ssh-sg"
   description = "Security group for SSH access to ${var.vm_name}"
@@ -56,6 +56,24 @@ resource "aws_security_group" "ssh_access" {
   tags = {
     Name = "${var.vm_name}-ssh-sg"
   }
+}
+
+# additional security group rules
+resource "aws_security_group" "additional_ingress_rules" {
+  for_each = {
+    for idx, rule in var.additional_ingress_security_group_rules:
+      rule.port => rule
+  }
+  name_prefix = "${var.vm_name}-additional-ingress-sg"
+  vpc_id      = var.vpc_id
+  ingress {
+    description = each.value.description
+    from_port   = each.value.port
+    to_port     = each.value.port
+    protocol    = each.value.protocol
+    cidr_blocks = each.value.cidr_blocks
+  }
+
 }
 
 resource "aws_instance" "vm" {

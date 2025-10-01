@@ -1,0 +1,3 @@
+[submodule "ansible-playbooks/openvpn"]
+	path = ansible-playbooks/openvpn
+	url = git@github.com:itsankoff/ansible.git

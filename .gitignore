@@ -8,3 +8,5 @@
 **/terraform.tfstate
 **/.terraform.tfstate.lock.info
 ansible-playbooks/kubernetes-nodes-config/inventory.ini
+tf-stacks/.DS_Store
+.DS_Store
