@@ -6,21 +6,6 @@ locals {
   ]
 }
 
-
-# resource "aws_security_group" "openvpn_access" {
-#   name_prefix = "openvpn-access-sg"
-#   description = "Security group for OpenVPN access"
-
-#   ingress {
-#     description = "OpenVPN"
-#     from_port   = 1194
-#     to_port     = 1194
-#     protocol    = "udp"
-#     cidr_blocks = ["0.0.0.0/0"]
-#   }
-# }
-
-# create a jump vm for openvpn
 module "aws-vm-jump" {
   count = 1
   source = "../../modules/aws-vm"

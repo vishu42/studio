@@ -80,7 +80,7 @@ resource "aws_instance" "vm" {
   ami                    = data.aws_ami.ubuntu.id
   instance_type          = "t3.small" # 2GB RAM, 2 vCPUs
   key_name               = aws_key_pair.ssh_key.key_name
-  vpc_security_group_ids = [aws_security_group.ssh_access.id]
+  vpc_security_group_ids = concat([aws_security_group.ssh_access.id], values(aws_security_group.additional_ingress_rules)[*].id)
   subnet_id              = var.subnet_id
 
   tags = {
