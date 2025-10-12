@@ -36,3 +36,9 @@ variable "tags" {
   description = "A map of tags to add to the VPC"
   default     = {}
 }
+
+variable "enable_igw" {
+  type        = bool
+  description = "Whether to enable the Internet Gateway"
+  default     = false
+}

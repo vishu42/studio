@@ -22,3 +22,7 @@ output "subnet_map" {
   } }
   description = "Map of subnet names to their details"
 }
+
+output "public_route_table_id" {
+  value = aws_route_table.public[0].id
+}

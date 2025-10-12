@@ -10,3 +10,4 @@
 ansible-playbooks/kubernetes-nodes-config/inventory.ini
 tf-stacks/.DS_Store
 .DS_Store
+ansible-playbooks/openvpn/**

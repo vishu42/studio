@@ -14,6 +14,7 @@ resource "aws_vpc" "vpc" {
 
 # Create Internet Gateway
 resource "aws_internet_gateway" "igw" {
+  count  = var.enable_igw ? 1 : 0
   vpc_id = aws_vpc.vpc.id
 
   tags = merge(
@@ -51,11 +52,12 @@ resource "aws_subnet" "subnets" {
 
 # Create route table for public subnets
 resource "aws_route_table" "public" {
+  count  = var.enable_igw ? 1 : 0
   vpc_id = aws_vpc.vpc.id
 
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.igw.id
+    gateway_id = aws_internet_gateway.igw[0].id
   }
 
   tags = merge(
@@ -68,8 +70,8 @@ resource "aws_route_table" "public" {
 
 # Associate subnets with route table
 resource "aws_route_table_association" "public" {
-  for_each = aws_subnet.subnets
+  for_each = var.enable_igw ? aws_subnet.subnets : {}
 
   subnet_id      = each.value.id
-  route_table_id = aws_route_table.public.id
+  route_table_id = aws_route_table.public[0].id
 }

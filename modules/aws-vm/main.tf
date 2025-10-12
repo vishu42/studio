@@ -61,8 +61,8 @@ resource "aws_security_group" "ssh_access" {
 # additional security group rules
 resource "aws_security_group" "additional_ingress_rules" {
   for_each = {
-    for idx, rule in var.additional_ingress_security_group_rules:
-      rule.port => rule
+    for idx, rule in var.additional_ingress_security_group_rules :
+    rule.port => rule
   }
   name_prefix = "${var.vm_name}-additional-ingress-sg"
   vpc_id      = var.vpc_id
@@ -77,11 +77,12 @@ resource "aws_security_group" "additional_ingress_rules" {
 }
 
 resource "aws_instance" "vm" {
-  ami                    = data.aws_ami.ubuntu.id
-  instance_type          = "t3.small" # 2GB RAM, 2 vCPUs
-  key_name               = aws_key_pair.ssh_key.key_name
-  vpc_security_group_ids = concat([aws_security_group.ssh_access.id], values(aws_security_group.additional_ingress_rules)[*].id)
-  subnet_id              = var.subnet_id
+  ami                         = data.aws_ami.ubuntu.id
+  instance_type               = "t3.small" # 2GB RAM, 2 vCPUs
+  key_name                    = aws_key_pair.ssh_key.key_name
+  vpc_security_group_ids      = concat([aws_security_group.ssh_access.id], values(aws_security_group.additional_ingress_rules)[*].id)
+  subnet_id                   = var.subnet_id
+  associate_public_ip_address = var.associate_public_ip_address
 
   tags = {
     Name = var.vm_name

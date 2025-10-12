@@ -18,10 +18,16 @@ variable "vpc_id" {
 variable "additional_ingress_security_group_rules" {
   type = list(object({
     description = optional(string)
-    port = number
+    port        = number
     protocol    = string
     cidr_blocks = list(string)
   }))
-  default = []
+  default     = []
   description = "A list of ingress security group rules"
+}
+
+variable "associate_public_ip_address" {
+  type        = bool
+  default     = false
+  description = "Whether to associate a public IP address with the VM"
 }
