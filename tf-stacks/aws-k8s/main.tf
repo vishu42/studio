@@ -7,13 +7,13 @@ locals {
 }
 
 module "aws-vm-jump-vpc" {
-  count      = 0
-  source     = "../../modules/aws-vpc"
-  vpc_name   = "aws-vm-jump-vpc"
-  vpc_cidr   = "10.1.0.0/16"
-  enable_igw = true
+  count       = 0
+  source      = "../../modules/aws-vpc"
+  vpc_name    = "aws-vm-jump-vpc"
+  vpc_cidr    = "10.1.0.0/16"
+  igw_enabled = true
   subnets = [
-    { name = "aws-vm-jump-subnet", cidr = "10.1.1.0/24" },
+    { name = "aws-vm-jump-subnet", cidr = "10.1.1.0/24", is_public = true, ntw_enabled = true },
   ]
   tags = {
     Environment = "development"
@@ -41,13 +41,12 @@ output "aws_vm_jump_public_ip" {
   description = "Public IP address of the jump VM"
 }
 
-
 module "aws-k8s-vpc" {
-  count      = 0
-  source     = "../../modules/aws-vpc"
-  vpc_name   = "aws-k8s-vpc"
-  vpc_cidr   = "10.0.0.0/16"
-  enable_igw = true
+  count       = 0
+  source      = "../../modules/aws-vpc"
+  vpc_name    = "aws-k8s-vpc"
+  vpc_cidr    = "10.0.0.0/16"
+  igw_enabled = false
   subnets = [
     { name = "aws-k8s-nodes-subnet", cidr = "10.0.1.0/24" },
   ]
@@ -55,6 +54,7 @@ module "aws-k8s-vpc" {
     Environment = "development"
   }
 }
+
 
 module "aws-k8s-nodes" {
   for_each  = toset(local.vms)
