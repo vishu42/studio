@@ -86,8 +86,28 @@ module "aws-k8s-nodes" {
     description = "Kubernetes"
     port        = 6443
     protocol    = "tcp"
-    cidr_blocks = ["10.1.0.0/16"]
-  }]
+    cidr_blocks = ["0.0.0.0/0"]
+  },
+  {
+    description = "Kubernetes"
+    port        = 10250
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  },
+  {
+    description = "HTTPS"
+    port        = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  },
+  {
+    description = "HTTP"
+    port        = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  
+  ]
 }
 
 output "aws_vm_private_ip" {
