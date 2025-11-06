@@ -45,8 +45,16 @@ module "aws-vm-jump" {
   associate_public_ip_address = true
   additional_ingress_security_group_rules = [{
     description = "OpenVPN"
-    port        = 1194
+    from_port   = 1194
+    to_port     = 1194
     protocol    = "udp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }]
+  additional_egress_security_group_rules = [{
+    description = "All outbound traffic"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }]
   subnet_id = module.aws-vm-jump-subnet[0].subnet_ids[0]
@@ -83,30 +91,22 @@ module "aws-k8s-nodes" {
   subnet_id = module.aws-k8s-subnet[0].subnet_ids[0]
   vpc_id    = module.aws-vm-jump-vpc[0].vpc_id
   additional_ingress_security_group_rules = [{
-    description = "Kubernetes"
-    port        = 6443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  },
-  {
-    description = "Kubernetes"
-    port        = 10250
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  },
-  {
-    description = "HTTPS"
-    port        = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  },
-  {
-    description = "HTTP"
-    port        = 80
-    protocol    = "tcp"
+    description = "All inbound traffic"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
-  
+
+  ]
+  additional_egress_security_group_rules = [
+    {
+      description = "All outbound traffic"
+      from_port   = 0
+      to_port     = 0
+      protocol    = "-1"
+      cidr_blocks = ["0.0.0.0/0"]
+    }
   ]
 }
 

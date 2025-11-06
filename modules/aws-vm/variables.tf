@@ -18,12 +18,25 @@ variable "vpc_id" {
 variable "additional_ingress_security_group_rules" {
   type = list(object({
     description = optional(string)
-    port        = number
+    from_port   = number
+    to_port     = number
     protocol    = string
     cidr_blocks = list(string)
   }))
   default     = []
   description = "A list of ingress security group rules"
+}
+
+variable "additional_egress_security_group_rules" {
+  type = list(object({
+    description = optional(string)
+    from_port   = number
+    to_port     = number
+    protocol    = string
+    cidr_blocks = list(string)
+  }))
+  default     = []
+  description = "A list of egress security group rules"
 }
 
 variable "associate_public_ip_address" {

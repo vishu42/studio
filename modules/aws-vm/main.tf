@@ -62,18 +62,33 @@ resource "aws_security_group" "ssh_access" {
 resource "aws_security_group" "additional_ingress_rules" {
   for_each = {
     for idx, rule in var.additional_ingress_security_group_rules :
-    rule.port => rule
+    "${rule.from_port}-${rule.to_port}-${rule.protocol}" => rule
   }
   name_prefix = "${var.vm_name}-additional-ingress-sg"
   vpc_id      = var.vpc_id
   ingress {
     description = each.value.description
-    from_port   = each.value.port
-    to_port     = each.value.port
+    from_port   = each.value.from_port
+    to_port     = each.value.to_port
     protocol    = each.value.protocol
     cidr_blocks = each.value.cidr_blocks
   }
 
+}
+resource "aws_security_group" "additional_egress_rules" {
+  for_each = {
+    for idx, rule in var.additional_egress_security_group_rules :
+    "${rule.from_port}-${rule.to_port}-${rule.protocol}" => rule
+  }
+  name_prefix = "${var.vm_name}-additional-egress-sg"
+  vpc_id      = var.vpc_id
+  egress {
+    description = each.value.description
+    from_port   = each.value.from_port
+    to_port     = each.value.to_port
+    protocol    = each.value.protocol
+    cidr_blocks = each.value.cidr_blocks
+  }
 }
 
 resource "aws_instance" "vm" {
