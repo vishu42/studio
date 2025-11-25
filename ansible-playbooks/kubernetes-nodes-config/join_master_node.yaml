@@ -1,0 +1,6 @@
+- name: join master node
+  hosts: all
+  become: yes
+  tasks:
+    - name: Join worker to cluster
+      command: "{{ kube_join_command }}"

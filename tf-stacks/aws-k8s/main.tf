@@ -1,8 +1,22 @@
 locals {
+
   vms = [
-    "aws-vm-01",
-    "aws-vm-02",
-    "aws-vm-03",
+    {
+      name = "aws-vm-large-01"
+      instance_type = "t3.large"
+    },
+    {
+      name = "aws-vm-large-02"
+      instance_type = "t3.xlarge"
+    },
+    {
+      name = "aws-vm-large-03"
+      instance_type = "t3.xlarge"
+    },
+    {
+      name = "aws-vm-large-04"
+      instance_type = "t3.xlarge"
+    }
   ]
   tags = {
     Environment = "development"
@@ -49,6 +63,27 @@ module "aws-vm-jump" {
     to_port     = 1194
     protocol    = "udp"
     cidr_blocks = ["0.0.0.0/0"]
+    },
+    {
+      description = "HTTP"
+      from_port   = 80
+      to_port     = 80
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    {
+      description = "HTTPS"
+      from_port   = 443
+      to_port     = 443
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    {
+      description = "8443"
+      from_port   = 8443
+      to_port     = 8443
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
   }]
   additional_egress_security_group_rules = [{
     description = "All outbound traffic"
@@ -85,18 +120,22 @@ module "aws-k8s-subnet" {
 }
 
 module "aws-k8s-nodes" {
-  for_each  = toset(local.vms)
-  source    = "../../modules/aws-vm"
-  vm_name   = each.value
-  subnet_id = module.aws-k8s-subnet[0].subnet_ids[0]
-  vpc_id    = module.aws-vm-jump-vpc[0].vpc_id
+  for_each      = {
+    for vm in local.vms : vm.name => vm.instance_type
+  }
+  source        = "../../modules/aws-vm-improved"
+  vm_name       = each.key
+  subnet_id     = module.aws-k8s-subnet[0].subnet_ids[0]
+  vpc_id        = module.aws-vm-jump-vpc[0].vpc_id
+  instance_type = each.value
+
   additional_ingress_security_group_rules = [{
     description = "All inbound traffic"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
-  }
+    }
 
   ]
   additional_egress_security_group_rules = [
